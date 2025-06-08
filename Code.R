@@ -7,22 +7,10 @@ library(plyr)
 library(ggplot2)
 library(Rgbp)
 
-
-setwd("C:/Users/akopo/OneDrive/Bureau/TER/Compte rendu")
-dat.dir <- 'Data'
-fig.dir <- 'Figs'
-
 #Data 
-gameLogs <- readr::read_csv(
-  "C:/Users/akopo/OneDrive/Bureau/TER/Compte rendu/worldfootballR/Par match par saison/logs_23_24.csv",
-  locale = locale(encoding = "UTF-8")
-)
+gameLogs <- readr::read_csv()
 
-
-allSeasonsData <- readr::read_csv(
-  "C:/Users/akopo/OneDrive/Bureau/TER/Compte rendu/data_fbref/allSeasonData.csv",
-  locale = locale(encoding = "UTF-8")
-)
+allSeasonsData <- readr::read_csv()
 
 # 1. Preliminary calculations for discrimination and stability -----------------
 
@@ -121,7 +109,7 @@ totals <- allSeasonsData[allSeasonsData$Player %in% minPlayers, ]
 
 # Loop
 nboot <- 20
-gdfSubset <- gameLogs[gameLogs$Player %in% minPlayers, ] # Since I already have it, we can also import it with: load(file.path(dat.dir, "footballReps.Rdata"))
+gdfSubset <- gameLogs[gameLogs$Player %in% minPlayers, ]
 
 repsList <- lapply(1:nboot, function(x) {
   print(sprintf("boostrapping %i of %i", x, nboot))
@@ -132,11 +120,6 @@ reps <- do.call(rbind, repsList)
 
 # Save reps
 save(reps, file=file.path(dat.dir, "footballReps.Rdata"))
-
-# # Enlever ce qui jouent moins de 1/4 du temps 
-# reps <- reps[reps$MP > minMP*3/4, ] # je ne vais pas utiliser ça 
-
-
 
 
 # 2. Calculation of stability and discrimination -------------------------------
@@ -232,7 +215,6 @@ rm(allSeasonsData_clean)
 
 ## 3.2. Gaussian copulas -------------------------------------------------------
 res <- sbgcop::sbgcop.mcmc(allSeasonsData) # Gaussian copula 
-  # Since I already have it, we can import it with: load(file.path(dat.dir, "fball-sbg.Rdata"))
 
 C <- apply(res$C.psamp, c(1,2), mean) # Mean matrix
 
